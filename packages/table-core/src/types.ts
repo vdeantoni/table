@@ -214,7 +214,7 @@ export interface Row<TData extends RowData>
     ColumnPinningRow<TData>,
     RowPinningRow,
     ColumnFiltersRow<TData>,
-    GroupingRow,
+    GroupingRow<TData>,
     RowSelectionRow,
     ExpandedRow {}
 

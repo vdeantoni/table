@@ -477,7 +477,9 @@ export const RowSelection: TableFeature = {
         value = typeof value !== 'undefined' ? value : !isSelected
 
         if (row.getCanSelect() && isSelected === value) {
-          return old
+          if (!row.leafRows || row.subRows?.length === 0) {
+            return old
+          }
         }
 
         const selectedRowIds = { ...old }
@@ -571,10 +573,20 @@ const mutateRowIsSelected = <TData extends RowData>(
   }
   // }
 
-  if (includeChildren && row.subRows?.length && row.getCanSelectSubRows()) {
-    row.subRows.forEach(row =>
-      mutateRowIsSelected(selectedRowIds, row.id, value, includeChildren, table)
-    )
+  if (includeChildren && row.getCanSelectSubRows()) {
+    const childRows = row.leafRows ?? row.subRows
+
+    if (childRows?.length) {
+      childRows.forEach((childRow: Row<TData>) =>
+        mutateRowIsSelected(
+          selectedRowIds,
+          childRow.id,
+          value,
+          includeChildren,
+          table
+        )
+      )
+    }
   }
 }
 
@@ -631,12 +643,14 @@ export function isSubRowSelected<TData extends RowData>(
   selection: Record<string, boolean>,
   table: Table<TData>
 ): boolean | 'some' | 'all' {
-  if (!row.subRows?.length) return false
+  const childRows = row.leafRows ?? row.subRows
+
+  if (!childRows?.length) return false
 
   let allChildrenSelected = true
   let someSelected = false
 
-  row.subRows.forEach(subRow => {
+  childRows.forEach((subRow: Row<TData>) => {
     // Bail out early if we know both of these
     if (someSelected && !allChildrenSelected) {
       return

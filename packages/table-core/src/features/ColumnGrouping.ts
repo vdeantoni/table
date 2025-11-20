@@ -108,7 +108,7 @@ export interface GroupingColumn<TData extends RowData> {
   toggleGrouping: () => void
 }
 
-export interface GroupingRow {
+export interface GroupingRow<TData extends RowData> {
   _groupingValuesCache: Record<string, any>
   /**
    * Returns the grouping value for any row and column (including leaf rows).
@@ -134,6 +134,10 @@ export interface GroupingRow {
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/grouping)
    */
   groupingValue?: unknown
+  /**
+   * If this row is grouped, this array contains all of the leaf rows in this group.
+   */
+  leafRows?: Row<TData>[]
 }
 
 export interface GroupingCell {
